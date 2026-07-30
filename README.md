@@ -3,10 +3,10 @@
 ![GitHub Release](https://img.shields.io/github/v/release/hardwin2023/sitestats?label=version&color=0c5c48)
 ![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
 UI界面：
-<img width="426" height="495" alt="后台管理登录" src="https://github.com/user-attachments/assets/f3436705-29cd-42ba-9bb7-c8cfb3437189" />
-<img width="1214" height="919" alt="总览页" src="https://github.com/user-attachments/assets/77508f04-414c-4ac0-9e2f-138ac3887475" />
-<img width="1209" height="915" alt="当日访问明细" src="https://github.com/user-attachments/assets/43604354-f5f9-409a-af4c-91adbd3a873f" />
-<img width="1214" height="917" alt="历史访问明细" src="https://github.com/user-attachments/assets/f87a4925-82f7-4fd7-911a-3942ce020cb4" />
+<img width="426" height="495" alt="后台管理登录" src="github_redme_pic/后台管理登录.png" />
+<img width="1214" height="919" alt="总览页" src="github_redme_pic/总览页.png" />
+<img width="1209" height="915" alt="当日访问明细" src="github_redme_pic/当日访问明细.png" />
+<img width="1214" height="917" alt="历史访问明细" src="github_redme_pic/历史访问明细.png" />
 设计说明：
 > 零第三方服务、可整体搬运的访问统计组件。**一行命令远程安装**，无需下载；
 > 智能安装器自动探测环境、协商端口、配置 nginx、自检全链路；
