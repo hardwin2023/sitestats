@@ -30,6 +30,8 @@ const HOST = '127.0.0.1';
 const MAX  = 20000;
 const TOKEN_TTL = 12 * 3600 * 1000;
 const STORE_IP = true;   // 明细需要 IP；仅登录后台可见，公开接口不暴露。设 false 则不存 IP
+const LOGIN_MAX_FAILS = 5;        // 连续失败多少次后锁定该 IP
+const LOGIN_LOCK_MS   = 15*60*1000; // 锁定时长（15 分钟）
 
 /* ---------------- 路径 ---------------- */
 const DATA_DIR  = path.join(__dirname, 'data');
@@ -51,6 +53,10 @@ const newToken = () => { const t = crypto.randomBytes(24).toString('hex'); token
 function validToken(t){ if(!t) return false; const exp = tokens.get(t); if(!exp) return false; if(Date.now()>exp){ tokens.delete(t); return false; } return true; }
 const cleaner = setInterval(()=>{ const n=Date.now(); for(const [t,exp] of tokens) if(n>exp) tokens.delete(t); }, 3600*1000);
 cleaner.unref && cleaner.unref();
+/* ---------------- 登录失败限流（按 IP，内存，重启清零更安全）---------------- */
+const loginFails = new Map();
+const failCleaner = setInterval(()=>{ const n=Date.now(); for(const [ip,v] of loginFails) if(v.until && n>v.until) loginFails.delete(ip); }, 60*1000);
+failCleaner.unref && failCleaner.unref();
 
 /* ---------------- 离线 GeoIP ---------------- */
 let geo = null;
@@ -148,8 +154,21 @@ app.get('/api/ss/summary', (req, res) => {
 });
 
 app.post('/api/ss/login', (req,res)=>{
+  const ip = clientIp(req);
+  const rec = loginFails.get(ip);
+  const now = Date.now();
+  if (rec && rec.until && now < rec.until) {
+    res.set('Retry-After', String(Math.ceil((rec.until-now)/1000)));
+    return res.status(429).json({ err:'失败次数过多，请 '+Math.ceil((rec.until-now)/60000)+' 分钟后再试' });
+  }
   const { password } = req.body || {};
-  if (typeof password!=='string' || sha256(password)!==auth.passHash) return res.status(401).json({ err:'密码错误' });
+  if (typeof password!=='string' || sha256(password)!==auth.passHash) {
+    const n = (rec && rec.until && now>=rec.until) ? 1 : ((rec ? rec.n : 0) + 1);
+    const locked = n >= LOGIN_MAX_FAILS;
+    loginFails.set(ip, { n: locked?0:n, until: locked ? now+LOGIN_LOCK_MS : 0 });
+    return res.status(locked?429:401).json({ err: locked ? '失败次数过多，已锁定，请 15 分钟后再试' : '密码错误' });
+  }
+  loginFails.delete(ip);
   res.json({ ok:1, token: newToken() });
 });
 app.post('/api/ss/logout', (req,res)=>{ const { token } = req.body||{}; if(token) tokens.delete(token); res.json({ ok:1 }); });
