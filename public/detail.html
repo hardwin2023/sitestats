@@ -38,7 +38,7 @@ button{font-family:inherit}
 .d-head{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin:4px 0 14px}
 .d-head h2{font-family:var(--disp);font-weight:400;font-size:22px;letter-spacing:.06em;display:flex;align-items:center;gap:10px}
 .d-mode{font:600 11px var(--mono);letter-spacing:.1em;color:var(--pine);border:1.5px solid var(--pine);padding:3px 10px;border-radius:999px}
-.d-scope{font:600 11px var(--mono);letter-spacing:.04em;color:var(--pine);background:rgba(12,92,72,.08);border:1px solid rgba(12,92,72,.22);padding:3px 10px;border-radius:999px;white-space:nowrap}
+.d-scope{font:500 14px var(--mono);letter-spacing:.06em;color:var(--ink2);white-space:nowrap}
 .d-tip{font:500 11.5px var(--mono);color:var(--ink3);margin-bottom:12px}
 .btn{font:600 12px var(--mono);letter-spacing:.06em;color:var(--ink2);background:var(--panel);border:1.5px solid var(--line);padding:8px 15px;cursor:pointer;transition:.2s}
 .btn:hover{border-color:var(--pine);color:var(--pine);transform:translateY(-1px)}
@@ -65,6 +65,7 @@ button{font-family:inherit}
 .mini i:hover{opacity:1}
 .mini-axis{display:flex;justify-content:space-between;font:500 9.5px var(--mono);color:var(--ink3);margin-top:5px}
 .d-notice{display:flex;align-items:center;gap:10px;font:600 12px var(--mono);padding:10px 14px;margin-bottom:14px;border-left:3px solid var(--ink3);background:var(--panel)}
+.d-notice[hidden]{display:none}
 .d-notice.err{border-left-color:#c4472f;color:#a23320;background:#fbeeec}
 .d-notice .d-retry{margin-left:auto;font:600 12px var(--mono);color:#fff;background:#c4472f;border:0;padding:6px 14px;border-radius:4px;cursor:pointer}
 .d-filter{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--panel);border:1px solid var(--line);padding:12px 14px;margin-bottom:14px}
@@ -116,7 +117,6 @@ table.dtable{width:100%;border-collapse:collapse;font-size:12.5px;min-width:940p
       <a class="back" href="/ss-admin.html">← 返回总览</a>
       <h1>访问明细</h1>
       <span class="m-badge" id="mBadge">当日</span>
-      <span class="ver-badge" id="verBadge"></span>
     </div>
     <button class="out" id="dOut">退出登录</button>
   </div>
@@ -124,7 +124,7 @@ table.dtable{width:100%;border-collapse:collapse;font-size:12.5px;min-width:940p
 <div id="detail">
   <div class="wrap">
     <div class="d-head">
-      <h2><span class="d-mode" id="dMode">当日</span><span class="d-scope" id="dScope"></span></h2>
+      <h2><span class="d-scope" id="dScope"></span></h2>
       <button class="btn" id="dExport">导出当前结果 CSV</button>
     </div>
     <div class="d-tip" id="dTip"></div>

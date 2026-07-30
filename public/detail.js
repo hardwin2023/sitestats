@@ -33,12 +33,10 @@
   }
   function renderScope() {
     var el = $('#dScope'); if (!el) return;
-    var n = state.filtered.length, tot = (state.all || []).length;
     var txt;
-    if (state.mode === 'today') txt = '当日 ' + todayKey() + ' · ' + n + ' 条';
-    else if (state.from || state.to) txt = '自定义 ' + (state.from || '…') + ' ~ ' + (state.to || '…') + ' · ' + n + ' 条';
-    else txt = '全部 · ' + n + ' 条（库内共 ' + tot + ' 条）';
-    if (state.search || state.dev || state.co) txt += ' · 已筛选';
+    if (state.mode === 'today') { txt = todayKey(); }
+    else if (state.from || state.to) { txt = (state.from || '…') + ' ~ ' + (state.to || '…'); }
+    else { var ds = []; (state.filtered || []).forEach(function (r) { if (r.d && ds.indexOf(r.d) < 0) ds.push(r.d); }); ds.sort(); txt = ds.length ? (ds[0] + (ds.length > 1 ? ' ~ ' + ds[ds.length - 1] : '')) : '—'; }
     el.textContent = txt;
   }
 
@@ -60,7 +58,7 @@
   function open(mode) {
     state.mode = mode; state.page = 1; state.search = ""; state.dev = ""; state.co = ""; state.from = ""; state.to = "";
     $('#dSearch').value = ""; $('#dDev').value = ""; $('#dCo').value = ""; $('#dFrom').value = ""; $('#dTo').value = "";
-    $('#dMode').textContent = mode === 'today' ? '当日' : '历史';
+    var _dm=$('#dMode'); if(_dm) _dm.textContent = mode === 'today' ? '当日' : '历史';
     $('#dRangeWrap').style.display = mode === 'today' ? 'none' : 'inline-flex';
     var badge = $('#mBadge');
     if (badge) badge.className = 'm-badge ' + (mode === 'today' ? 'live' : 'calm');
@@ -216,9 +214,6 @@
   });
   var out = $('#dOut'); if (out) out.addEventListener('click', function () { sessionStorage.removeItem('ss_token'); goLogin(); });
 
-  fetch('/api/ss/version').then(function (r) { return r.json(); }).then(function (d) {
-    var b = $('#verBadge'); if (b && d && d.version) { b.textContent = 'v' + d.version; b.title = (d.name || 'SiteStats') + ' · 版本单一源 package.json'; }
-  }).catch(function () {});
 
   if (!token()) { goLogin(); return; }
   open(MODE);
