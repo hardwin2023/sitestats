@@ -1,0 +1,20 @@
+<!-- SiteStats 首页挂件（可选）：复制下面整段到页面 </body> 前。
+     依赖已接入 SiteStats（使用公开的 /api/ss/summary 接口）。 -->
+<div id="ss-widget" style="position:fixed;left:14px;bottom:14px;z-index:9999;font-family:system-ui,-apple-system,sans-serif;">
+  <a href="/ss-admin.html" title="访问统计后台" style="display:inline-flex;align-items:center;gap:6px;text-decoration:none;background:rgba(21,36,32,.7);color:#e9f5ee;padding:6px 12px;border-radius:999px;font-size:12px;line-height:1;backdrop-filter:blur(4px);opacity:.5;transition:opacity .3s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.5">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/></svg>
+    <span>今日 <b id="ss-today" style="font-variant-numeric:tabular-nums;">…</b> 次访问</span>
+  </a>
+</div>
+<script>
+(function () {
+  function load() {
+    fetch('/api/ss/summary').then(function (r) { return r.json(); }).then(function (d) {
+      var el = document.getElementById('ss-today');
+      if (el) el.textContent = d.todayPV;
+    }).catch(function () {});
+  }
+  load();
+  setInterval(load, 30000);
+})();
+</script>

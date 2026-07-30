@@ -1,0 +1,14 @@
+{
+  "name": "sitestats",
+  "version": "1.0.0",
+  "description": "轻量可复用站点访问统计：服务端存储 + 离线 GeoIP 地域 + 服务端密码鉴权 + 实时后台 + SPA 路由自动统计",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "start": "node server/stats.mjs"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "geoip-lite": "^1.4.10"
+  }
+}
