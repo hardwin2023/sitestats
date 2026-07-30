@@ -209,49 +209,6 @@ location = /ss-admin.html { add_header Cache-Control "no-cache"; try_files $uri 
 | `TOKEN_TTL` | 12 小时 | 过期 / 重启需重新登录 |
 | 默认密码 | `admin123` | 首次运行写入 `auth.json`，后台可改 |
 
-## 版本与发版
-
-版本号**单一源** = `package.json` 的 `version` 字段。服务端启动时读它、经 `/api/ss/version` 暴露、后台标题旁实时显示——**改一处，处处同步**。
-
-迭代发版流程：
-
-```bash
-# 1. 改 package.json 的 version（如 1.0.0 → 1.1.0），改完代码
-# 2. 提交
-git add -A && git commit -m "feat: 你的更新说明"
-git push
-# 3. 打 tag 并推送（脚本自动从 package.json 读版本号）
-./release.sh
-# 4. 去 GitHub 基于新 tag 创建 Release，写几句更新说明
-```
-
-远程安装指定版本：`SITESTATS_VERSION=v1.1.0`（见"远程一键安装"）。
-
-## 数据与备份（⚠️ 读过能避坑）
-
-统计数据与密码在 **`server/data/`**（是 `server/` 下的 `data`，**不是**模块根的 `data`）：`visits.json`、`auth.json`。
-
-```bash
-#!/bin/bash
-mkdir -p /root/backup
-tar czf "/root/backup/site-$(date +%F).tar.gz" -C / \
-    opt/sitestats/server/data \
-    var/www/html/server/data        # 你的项目后端数据若在此则一并备份，否则删掉这行
-```
-
-> 🩸 **真实踩坑**：曾把路径写成 `opt/sitestats/data`（少了 `server/`），每周"备份"打包的是废弃空目录，真数据从未被备份。**写完后 `tar -tzf 包名` 核对清单**，看到 `visits.json`/`auth.json` 才算数。
-> 🩸 **另一条**：清理旧文件时，绝不对承载其它服务数据的目录用 `rm -rf`——先 `ls` 看清里面住着谁。
-
-恢复：`tar xzf /root/backup/site-YYYY-MM-DD.tar.gz -C /`（解回前先 `cp -r` 留底），再 `pm2 restart sitestats`。
-
-## 运维
-
-```bash
-pm2 start server/stats.mjs --name sitestats && pm2 save && pm2 startup
-pm2 logs sitestats             # 启动行会打印 v版本号 与 STORE_IP
-python3 install.py --check     # 随时自检全链路
-```
-
 ## 复用到其他项目（清单）
 
 1. [ ] 一行 `curl … | bash`（或复制整个 `sitestats/` 到目标服务器，跑 `python3 install.py`）
