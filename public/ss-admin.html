@@ -168,6 +168,29 @@ table.dtable{width:100%;border-collapse:collapse;font-size:12.5px;min-width:940p
 @media(max-width:680px){.d-stats{grid-template-columns:repeat(2,1fr)}.d-dist{grid-template-columns:1fr}}
 .ver-badge{display:inline-block;margin-left:10px;font:600 11px var(--mono);letter-spacing:.05em;color:var(--pine);background:rgba(12,92,72,.08);border:1px solid rgba(12,92,72,.25);padding:2px 9px;border-radius:999px;vertical-align:middle;transition:.2s}
 .ver-badge:hover{background:rgba(12,92,72,.16)}
+/* 范围标识 + 加载/失败反馈（让每个数字自带归属，让每次加载都有回响） */
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.d-scope{margin-left:12px;font:600 11px var(--mono);letter-spacing:.04em;color:var(--pine);background:rgba(12,92,72,.08);border:1px solid rgba(12,92,72,.22);padding:3px 10px;border-radius:999px;vertical-align:middle;white-space:nowrap;transition:.2s}
+.d-notice{display:flex;align-items:center;gap:10px;font:600 12px var(--mono);padding:10px 14px;margin-bottom:14px;border-left:3px solid var(--ink3);background:var(--panel);animation:fadeIn .25s}
+.d-notice.err{border-left-color:#c4472f;color:#a23320;background:#fbeeec}
+.d-notice .d-retry{margin-left:auto;font:600 12px var(--mono);color:#fff;background:#c4472f;border:0;padding:6px 14px;border-radius:4px;cursor:pointer;transition:.2s}
+.d-notice .d-retry:hover{background:#a23320;transform:translateY(-1px)}
+.d-notice .d-retry:active{transform:translateY(0)}
+.d-spin{display:inline-block;width:13px;height:13px;border:2px solid var(--line);border-top-color:var(--pine);border-radius:50%;vertical-align:-2px;margin-right:6px;animation:dspin .7s linear infinite}
+@keyframes dspin{to{transform:rotate(360deg)}}
+/* ===== 登录窗口：密码眼睛 + 底部版本号 ===== */
+.pw-wrap{position:relative}
+.eye{position:absolute;right:7px;top:50%;transform:translateY(-50%);width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:none;border:0;border-radius:6px;cursor:pointer;color:var(--ink3);transition:color .2s,background .2s,transform .12s;z-index:2}
+.eye:hover{color:var(--pine);background:rgba(12,92,72,.08)}
+.eye:active{transform:translateY(-50%) scale(.88)}
+.eye svg{width:18px;height:18px;pointer-events:none}
+.eye .i-closed{display:none}
+.eye.showing .i-open{display:none}
+.eye.showing .i-closed{display:block}
+@keyframes loginVerPulse{0%,100%{box-shadow:0 0 0 3px rgba(12,92,72,.14)}50%{box-shadow:0 0 0 6px rgba(12,92,72,.03)}}
+.login-ver{display:flex;align-items:center;justify-content:center;gap:9px;margin:0 0 10px;font:600 11px var(--mono);letter-spacing:.2em;color:var(--ink3);user-select:none;transition:color .25s}
+.login-ver::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--pine);animation:loginVerPulse 2.6s ease-in-out infinite}
+.login-ver:hover{color:var(--pine)}
 </style>
 </head>
 <body>
@@ -181,7 +204,7 @@ table.dtable{width:100%;border-collapse:collapse;font-size:12.5px;min-width:940p
       <button class="gbtn" type="submit">进 入</button>
     </form>
     <div id="gerr"></div>
-    <div class="ghint">默认密码 <code>admin123</code> · 密码存于服务端，全设备通用 · 进入后可修改</div>
+    <div class="ghint"><span class="clock"></span></div>
   </div>
 </div>
 <div id="dash">
@@ -190,7 +213,7 @@ table.dtable{width:100%;border-collapse:collapse;font-size:12.5px;min-width:940p
       <div>
         <a class="back" href="/">← 返回首页</a>
         <h1>访问统计控制台</h1>
-        <span class="clock" id="clock"></span>
+        <span class="clock"></span>
       </div>
       <div class="tr">
         <span class="src" id="srcChip"><i class="dot"></i>实时 · 服务端</span>
@@ -227,12 +250,13 @@ table.dtable{width:100%;border-collapse:collapse;font-size:12.5px;min-width:940p
     </div>
           <div id="detail">
         <div class="d-head">
-          <h2>访问明细 <span class="d-mode" id="dMode">当日</span></h2>
+          <h2>访问明细 <span class="d-mode" id="dMode">当日</span><span class="d-scope" id="dScope"></span></h2>
           <button class="btn" id="dExport">导出当前结果 CSV</button>
         </div>
         <div class="d-tip" id="dTip"></div>
         <div class="d-stats" id="dStats"></div>
         <div class="d-dist" id="dDist"></div>
+        <div class="d-notice" id="dNotice" hidden></div>
         <div class="d-filter">
           <input class="search" id="dSearch" type="text" placeholder="搜索 IP / 页面 / 地域 / 系统 / UA…">
           <select id="dDev"><option value="">全部设备</option></select>
@@ -419,9 +443,9 @@ table.dtable{width:100%;border-collapse:collapse;font-size:12.5px;min-width:940p
   async function logout(){ try { await fetch(API+'/logout', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ token: TOKEN }) }); } catch(e){}
     TOKEN=''; sessionStorage.removeItem(AUTH_KEY); stopLive();
     $('#dash').style.display='none'; $('#gate').style.display='flex'; $('#gpw').value=''; }
-  function enter(){ $('#gate').style.display='none'; $('#dash').style.display='block'; renderAll(false); startClock(); startLive(); }
+  function enter(){ $('#gate').style.display='none'; $('#dash').style.display='block'; renderAll(false); startLive(); }
   function startClock(){ const f=n=>String(n).padStart(2,'0');
-    const tick=()=>{ const d=new Date(); $('#clock').textContent=`${d.getFullYear()}-${f(d.getMonth()+1)}-${f(d.getDate())} ${f(d.getHours())}:${f(d.getMinutes())}:${f(d.getSeconds())}`; };
+    const tick=()=>{ const d=new Date(); const s=`${d.getFullYear()}-${f(d.getMonth()+1)}-${f(d.getDate())} ${f(d.getHours())}:${f(d.getMinutes())}:${f(d.getSeconds())}`; document.querySelectorAll('.clock').forEach(el=>el.textContent=s); };
     tick(); setInterval(tick,1000); }
 
   $('#gform').addEventListener('submit', async e => { e.preventDefault(); const pw=$('#gpw').value;
@@ -430,6 +454,7 @@ table.dtable{width:100%;border-collapse:collapse;font-size:12.5px;min-width:940p
       if (r.ok && j.token){ TOKEN=j.token; sessionStorage.setItem(AUTH_KEY, TOKEN); $('#gerr').textContent=''; enter(); }
       else { $('#gerr').textContent=(j&&j.err)||'密码错误'; const c=$('#gcard'); c.classList.remove('shake'); void c.offsetWidth; c.classList.add('shake'); $('#gpw').select(); }
     } catch(e){ $('#gerr').textContent='无法连接服务端'; } });
+  startClock();
   if (TOKEN) enter(); else $('#gate').style.display='flex';
 
   $('#rg').addEventListener('click', e => { const b=e.target.closest('.rbtn'); if(!b) return; RANGE=+b.dataset.r;
@@ -483,11 +508,39 @@ table.dtable{width:100%;border-collapse:collapse;font-size:12.5px;min-width:940p
   function fmtStay(s){ if(!s) return '—'; return s>=60 ? Math.floor(s/60)+'分'+(s%60?s%60+'秒':'') : s+'秒'; }
   function toast(msg){ var t=$('#toast'); if(!t) return; t.textContent=msg; t.classList.add('on'); clearTimeout(t._tt); t._tt=setTimeout(function(){ t.classList.remove('on'); }, 1800); }
 
+  function showNotice(kind, msg){
+    var n=$('#dNotice'); if(!n) return;
+    n.hidden=false; n.className='d-notice '+kind;
+    n.innerHTML = msg + (kind==='err' ? ' <button class="d-retry" id="dRetry">重新加载</button>' : '');
+    if(kind==='err'){ var b=$('#dRetry'); if(b) b.onclick=function(){ open(state.mode); }; }
+  }
+  function hideNotice(){ var n=$('#dNotice'); if(n){ n.hidden=true; n.innerHTML=''; } }
+  function renderScope(){
+    var el=$('#dScope'); if(!el) return;
+    var n=state.filtered.length, tot=(state.all||[]).length;
+    var txt;
+    if(state.mode==='today') txt='当日 '+todayKey()+' · '+n+' 条';
+    else if(state.from||state.to) txt='自定义 '+(state.from||'…')+' ~ '+(state.to||'…')+' · '+n+' 条';
+    else txt='全部 · '+n+' 条（库内共 '+tot+' 条）';
+    if(state.search||state.dev||state.co) txt+=' · 已筛选';
+    el.textContent=txt;
+  }
   function fetchVisits(cb){
+    $('#dBody').innerHTML='<tr><td colspan="11"><div class="d-loading"><span class="d-spin"></span>正在加载明细…</div></td></tr>';
     fetch(API+'/visits?token='+encodeURIComponent(token())).then(function(r){
-      if(r.status===401){ $('#detail').innerHTML='<div class="d-empty">登录已过期，请刷新页面重新登录。</div>'; return []; }
+      if(r.status===401){ $('#detail').innerHTML='<div class="d-empty">登录已过期，请刷新页面重新登录。</div>'; return; }
+      if(!r.ok) throw new Error('HTTP '+r.status);
       return r.json();
-    }).then(function(d){ cb(d||[]); }).catch(function(){ cb([]); });
+    }).then(function(d){
+      if(!Array.isArray(d)) return;        // 401 等无数据情况：保留旧视图，不清空
+      hideNotice();
+      cb(d);
+    }).catch(function(e){
+      showNotice('err', '加载失败（'+(e&&e.message?e.message:'网络异常')+'）——下方保留上一次成功的数据。');
+      if(!state.all || !state.all.length){
+        $('#dBody').innerHTML='<tr><td colspan="11"><div class="d-empty">未能加载数据，请检查网络后点上方「重新加载」。</div></td></tr>';
+      }
+    });
   }
 
   function open(mode){
@@ -528,7 +581,7 @@ table.dtable{width:100%;border-collapse:collapse;font-size:12.5px;min-width:940p
     var k=state.sortK, dir=state.sortDir;
     state.filtered.sort(function(a,b){ var x=a[k], y=b[k]; if(x==null)x=''; if(y==null)y=''; if(typeof x==='number'&&typeof y==='number') return (x-y)*dir; return String(x).localeCompare(String(y))*dir; });
     state.page=Math.min(state.page, Math.max(1, Math.ceil(state.filtered.length/PAGE_SIZE)));
-    renderStats(); renderDist(); renderTable(); renderPager();
+        renderStats(); renderDist(); renderTable(); renderPager(); renderScope();
   }
 
   function renderStats(){
@@ -639,18 +692,55 @@ table.dtable{width:100%;border-collapse:collapse;font-size:12.5px;min-width:940p
 })();
 </script>
 <script>
-/* 版本号：从服务端 /api/ss/version 拉取，单一源 = package.json */
+/* ===== UI 增强：密码眼睛 + 版本号（总览徽章 & 登录窗内联，版本只 fetch 一次）===== */
 (function () {
-  fetch('/api/ss/version').then(function (r) { return r.json(); }).then(function (d) {
+  'use strict';
+  function injectEye() {
+    var pw = document.getElementById('gpw');
+    if (!pw || pw.dataset.eyeInjected) return;
+    pw.dataset.eyeInjected = '1';
+    var wrap = document.createElement('div');
+    wrap.className = 'pw-wrap';
+    pw.parentNode.insertBefore(wrap, pw);
+    wrap.appendChild(pw);
+    pw.style.paddingRight = '46px';
+    var btn = document.createElement('button');
+    btn.type = 'button'; btn.className = 'eye';
+    btn.title = '显示/隐藏密码'; btn.setAttribute('aria-label', '显示密码');
+    btn.innerHTML =
+      '<svg class="i-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>' +
+      '<svg class="i-closed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.4 10.4 0 0 1 12 5c6.5 0 10 7 10 7a13.2 13.2 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.5 13.5 0 0 0 2 12s3.5 7 10 7a9.7 9.7 0 0 0 5.39-1.61"/><line x1="2" y1="2" x2="22" y2="22"/></svg>';
+    wrap.appendChild(btn);
+    btn.addEventListener('click', function () {
+      var show = pw.type === 'password';
+      pw.type = show ? 'text' : 'password';
+      btn.classList.toggle('showing', show);
+      btn.setAttribute('aria-label', show ? '隐藏密码' : '显示密码');
+      pw.focus();
+    });
+  }
+  function injectVersions(d) {
     if (!d || !d.version) return;
-    var h1 = document.querySelector('.top h1') || document.querySelector('h1');
-    if (!h1) return;
-    var b = document.createElement('span');
-    b.className = 'ver-badge';
-    b.textContent = 'v' + d.version;
-    b.title = (d.name || 'SiteStats') + ' · 版本单一源 package.json';
-    h1.appendChild(b);
-  }).catch(function () {});
+    var title = (d.name || 'SiteStats') + ' · 版本单一源 package.json';
+    var h1 = document.querySelector('.top h1');
+    if (h1 && !h1.querySelector('.ver-badge')) {
+      var b = document.createElement('span');
+      b.className = 'ver-badge'; b.textContent = 'v' + d.version; b.title = title;
+      h1.appendChild(b);
+    }
+    var hint = document.querySelector('#gate .ghint');
+    if (hint && !hint.querySelector('.login-ver')) {
+      var v = document.createElement('div');
+      v.className = 'login-ver'; v.textContent = 'v' + d.version; v.title = title;
+      var clock = hint.querySelector('.clock');
+      if (clock) hint.insertBefore(v, clock); else hint.appendChild(v);
+    }
+  }
+  function go() {
+    injectEye();
+    fetch('/api/ss/version').then(function (r) { return r.json(); }).then(injectVersions).catch(function () {});
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go); else go();
 })();
 </script>
 </body>
