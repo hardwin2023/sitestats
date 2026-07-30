@@ -21,6 +21,8 @@ import { createRequire } from 'module';
 
 const require = createRequire(import.meta.url);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const PKG = require('../package.json');
+const VERSION = PKG.version || '0.0.0';
 
 /* ---------------- 配置 ---------------- */
 const PORT = process.env.SS_PORT || 3881;
@@ -109,7 +111,8 @@ const authed = (req,res,next) => {
   const token = req.query.token || (req.headers.authorization||'').replace(/^Bearer\s+/i,'');
   return validToken(token) ? next() : res.status(401).json({ err:'unauthorized' });
 };
-
+/* 版本（公开，单一源 = package.json） */
+app.get('/api/ss/version', (req,res)=> res.json({ name: PKG.name, version: VERSION }));
 app.post('/api/ss/report', (req,res)=>{
   const b = req.body || {};
   const ip = clientIp(req);
@@ -161,4 +164,4 @@ app.get('/api/ss/visits', authed, (req,res)=> res.json(read()));
 app.post('/api/ss/seed', authed, (req,res)=>{ const arr = Array.isArray(req.body)?req.body:[]; cache = read(); cache.push(...arr.slice(0,8000)); write(); res.json({ ok:1, total: cache.length }); });
 app.post('/api/ss/clear', authed, (req,res)=>{ cache = []; write(); res.json({ ok:1 }); });
 
-app.listen(PORT, HOST, ()=> console.log(`SiteStats 运行于 http://${HOST}:${PORT}（/api/ss/* · STORE_IP=${STORE_IP}）`));
+app.listen(PORT, HOST, ()=> console.log(`SiteStats v${VERSION} 运行于 http://${HOST}:${PORT}（/api/ss/* · STORE_IP=${STORE_IP}）`));

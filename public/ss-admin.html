@@ -166,6 +166,8 @@ table.dtable{width:100%;border-collapse:collapse;font-size:12.5px;min-width:940p
 .d-empty,.d-loading{padding:48px 0;text-align:center;color:var(--ink3);font:500 14px var(--mono)}
 @media(max-width:1080px){.d-stats{grid-template-columns:repeat(3,1fr)}.d-dist{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:680px){.d-stats{grid-template-columns:repeat(2,1fr)}.d-dist{grid-template-columns:1fr}}
+.ver-badge{display:inline-block;margin-left:10px;font:600 11px var(--mono);letter-spacing:.05em;color:var(--pine);background:rgba(12,92,72,.08);border:1px solid rgba(12,92,72,.25);padding:2px 9px;border-radius:999px;vertical-align:middle;transition:.2s}
+.ver-badge:hover{background:rgba(12,92,72,.16)}
 </style>
 </head>
 <body>
@@ -634,6 +636,21 @@ table.dtable{width:100%;border-collapse:collapse;font-size:12.5px;min-width:940p
     a.click(); URL.revokeObjectURL(a.href);
     toast('已导出 '+state.filtered.length+' 条');
   });
+})();
+</script>
+<script>
+/* 版本号：从服务端 /api/ss/version 拉取，单一源 = package.json */
+(function () {
+  fetch('/api/ss/version').then(function (r) { return r.json(); }).then(function (d) {
+    if (!d || !d.version) return;
+    var h1 = document.querySelector('.top h1') || document.querySelector('h1');
+    if (!h1) return;
+    var b = document.createElement('span');
+    b.className = 'ver-badge';
+    b.textContent = 'v' + d.version;
+    b.title = (d.name || 'SiteStats') + ' · 版本单一源 package.json';
+    h1.appendChild(b);
+  }).catch(function () {});
 })();
 </script>
 </body>
