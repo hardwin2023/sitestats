@@ -66,7 +66,8 @@ sitestats/
 │  └─ data/                运行后自动生成（visits.json / auth.json，已 gitignore）
 ├─ public/
 │  ├─ ss.js                前端埋点（自动上报 + SPA 路由 + 聚合函数）
-│  └─ ss-admin.html        统计后台（仪表盘 + 明细钻取 + 版本徽章）
+│  ├─ ss-admin.html        登录 + 总览仪表盘
+│  └─ detail.html / detail.js   访问明细（当日实时 / 历史全景，差异化视图）
 ├─ nginx-sitestats.conf    nginx 接入片段
 ├─ examples/
 │  └─ widget.html          可选：首页"今日访问"挂件

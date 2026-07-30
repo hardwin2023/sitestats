@@ -37,6 +37,8 @@ SNIPPET = """    # ===== SiteStats (auto by install.py) =====
     }
     location = /ss.js { add_header Cache-Control "no-cache"; try_files $uri =404; }
     location = /ss-admin.html { add_header Cache-Control "no-cache"; try_files $uri =404; }
+    location = /detail.html { add_header Cache-Control "no-cache"; try_files $uri =404; }
+    location = /detail.js { add_header Cache-Control "no-cache"; try_files $uri =404; }
     # ===== SiteStats end =====
 """
 SNIPPET_MARK = 'location ^~ /api/ss/'
@@ -554,7 +556,7 @@ def main():
     step(4, "部署静态文件" + (f" → {webroot}" if webroot else "（跳过）"))
     if webroot:
         os.makedirs(webroot, exist_ok=True)
-        for fn in ('ss.js', 'ss-admin.html'):
+        for fn in ('ss.js', 'ss-admin.html', 'detail.html', 'detail.js'):
             src = os.path.join(PUBLIC_DIR, fn)
             if os.path.isfile(src):
                 shutil.copy2(src, os.path.join(webroot, fn)); ok(f"已部署 {fn}")
