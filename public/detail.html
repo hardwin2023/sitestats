@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>访问明细 · SiteStats</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=ZCOOL+QingKe+HuangYou&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{ --bg:#edf1e9; --panel:#fbfcf8; --line:#c9d4c6; --line2:#e2e9df; --ink:#152420; --ink2:#4a5c53; --ink3:#7d918a;
+  --pine:#0c5c48; --pine2:#0a4a3a; --gold:#e8a70e; --gold2:#8a6200; --cyan:#1f7a8c; --blue:#2f6db3; --coral:#c4472f;
+  --mono:'JetBrains Mono',ui-monospace,monospace; --disp:'ZCOOL QingKe HuangYou','Noto Sans SC',sans-serif; }
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Noto Sans SC',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;line-height:1.6}
+::selection{background:var(--gold);color:var(--ink)}
+body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(rgba(12,92,72,.12) 1px,transparent 1px);background-size:26px 26px;pointer-events:none}
+body::after{content:'';position:fixed;inset:0;background:radial-gradient(760px 520px at 4% -8%,rgba(12,92,72,.10),transparent 60%),radial-gradient(680px 480px at 100% 112%,rgba(232,167,14,.12),transparent 60%);pointer-events:none}
+.wrap{max-width:1240px;margin:0 auto;padding:0 24px;position:relative;z-index:1}
+button{font-family:inherit}
+@keyframes ping{from{transform:scale(.45);opacity:.85}to{transform:scale(1.7);opacity:0}}
+/* 顶栏 */
+.dtop{position:sticky;top:0;z-index:20;background:rgba(251,252,248,.92);border-bottom:1.5px solid var(--line);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.dtop .wrap{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding-top:14px;padding-bottom:14px}
+.dtop .left{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.dtop .back{font:600 12.5px var(--mono);color:var(--ink2);letter-spacing:.06em;text-decoration:none;transition:.2s}
+.dtop .back:hover{color:var(--pine)}
+.dtop h1{font-family:var(--disp);font-weight:400;font-size:24px;letter-spacing:.06em}
+.m-badge{font:700 11px var(--mono);letter-spacing:.1em;padding:3px 11px;border-radius:999px;border:1.5px solid;display:inline-flex;align-items:center;gap:6px}
+.m-badge.live{color:var(--gold2);border-color:var(--gold)}
+.m-badge.live::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--gold);animation:ping 1.6s ease-out infinite}
+.m-badge.calm{color:var(--pine);border-color:var(--pine)}
+.ver-badge{font:600 11px var(--mono);letter-spacing:.05em;color:var(--pine);background:rgba(12,92,72,.08);border:1px solid rgba(12,92,72,.25);padding:2px 9px;border-radius:999px}
+.dtop .out{font:600 12px var(--mono);color:var(--ink2);background:var(--panel);border:1.5px solid var(--line);padding:7px 14px;cursor:pointer;transition:.2s}
+.dtop .out:hover{border-color:var(--coral);color:var(--coral)}
+/* 明细主体 */
+#detail{padding:26px 0 60px}
+.d-head{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin:4px 0 14px}
+.d-head h2{font-family:var(--disp);font-weight:400;font-size:22px;letter-spacing:.06em;display:flex;align-items:center;gap:10px}
+.d-mode{font:600 11px var(--mono);letter-spacing:.1em;color:var(--pine);border:1.5px solid var(--pine);padding:3px 10px;border-radius:999px}
+.d-scope{font:600 11px var(--mono);letter-spacing:.04em;color:var(--pine);background:rgba(12,92,72,.08);border:1px solid rgba(12,92,72,.22);padding:3px 10px;border-radius:999px;white-space:nowrap}
+.d-tip{font:500 11.5px var(--mono);color:var(--ink3);margin-bottom:12px}
+.btn{font:600 12px var(--mono);letter-spacing:.06em;color:var(--ink2);background:var(--panel);border:1.5px solid var(--line);padding:8px 15px;cursor:pointer;transition:.2s}
+.btn:hover{border-color:var(--pine);color:var(--pine);transform:translateY(-1px)}
+.btn.reset{margin-left:auto}
+.d-stats{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:16px}
+.d-stat{position:relative;background:var(--panel);border:1px solid var(--line);padding:12px 14px}
+.d-stat::before{content:'';position:absolute;top:-1px;left:-1px;width:11px;height:11px;border-top:2px solid var(--gold);border-left:2px solid var(--gold)}
+.d-stat .l{font:600 10px var(--mono);letter-spacing:.14em;color:var(--ink2)}
+.d-stat .v{font:700 22px/1.2 var(--mono);color:var(--ink);margin-top:2px}
+.d-stat .sub{font:500 10.5px var(--mono);color:var(--ink3);margin-top:3px;letter-spacing:.02em}
+.d-stat.live::after{content:'';position:absolute;top:11px;right:11px;width:7px;height:7px;border-radius:50%;background:var(--gold);animation:ping 1.7s ease-out infinite}
+.d-dist{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:16px}
+.panel{position:relative;background:var(--panel);border:1px solid var(--line);padding:14px 16px}
+.panel::before,.panel::after{content:'';position:absolute;width:14px;height:14px;border:2.5px solid var(--pine)}
+.panel::before{top:-1px;left:-1px;border-right:0;border-bottom:0}.panel::after{bottom:-1px;right:-1px;border-left:0;border-top:0}
+.panel h4{font:600 11px var(--mono);letter-spacing:.12em;color:var(--ink2);margin-bottom:10px}
+.dbar{display:grid;grid-template-columns:minmax(64px,96px) 1fr 34px;gap:8px;align-items:center;padding:4px 0;font-size:12px}
+.dbar .n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink)}
+.dbar .t{height:7px;background:var(--line2);overflow:hidden}
+.dbar .t i{display:block;height:100%;width:0;transition:width .7s cubic-bezier(.2,.7,.3,1)}
+.dbar .c{font:700 12px var(--mono);text-align:right;color:var(--ink2)}
+.mini{display:flex;align-items:flex-end;gap:2px;height:46px}
+.mini i{flex:1;min-width:2px;border-radius:1px 1px 0 0;opacity:.85;transition:height .6s cubic-bezier(.2,.7,.3,1)}
+.mini i:hover{opacity:1}
+.mini-axis{display:flex;justify-content:space-between;font:500 9.5px var(--mono);color:var(--ink3);margin-top:5px}
+.d-notice{display:flex;align-items:center;gap:10px;font:600 12px var(--mono);padding:10px 14px;margin-bottom:14px;border-left:3px solid var(--ink3);background:var(--panel)}
+.d-notice.err{border-left-color:#c4472f;color:#a23320;background:#fbeeec}
+.d-notice .d-retry{margin-left:auto;font:600 12px var(--mono);color:#fff;background:#c4472f;border:0;padding:6px 14px;border-radius:4px;cursor:pointer}
+.d-filter{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--panel);border:1px solid var(--line);padding:12px 14px;margin-bottom:14px}
+.d-filter input,.d-filter select{background:#f2f5ee;border:1.5px solid var(--line);color:var(--ink);font:500 13px var(--mono);padding:7px 10px;outline:none;transition:border .2s}
+.d-filter input:focus,.d-filter select:focus{border-color:var(--pine)}
+.d-filter .search{flex:1;min-width:180px}
+.d-tablewrap{background:var(--panel);border:1px solid var(--line);overflow-x:auto}
+table.dtable{width:100%;border-collapse:collapse;font-size:12.5px;min-width:940px}
+.dtable th{position:sticky;top:0;background:#eef2ea;font:600 11px var(--mono);letter-spacing:.06em;color:var(--ink2);text-align:left;padding:10px 12px;border-bottom:1.5px solid var(--line);white-space:nowrap;user-select:none}
+.dtable th[data-k]{cursor:pointer}.dtable th[data-k]:hover{color:var(--pine)}
+.dtable th .arr{opacity:.35;font-size:9px}.dtable th.sorted .arr{opacity:1;color:var(--pine)}
+.dtable td{padding:9px 12px;border-bottom:1px solid var(--line2);vertical-align:middle;white-space:nowrap}
+.dtable tbody tr.row{cursor:pointer;transition:background .15s}
+.dtable tbody tr.row:hover{background:rgba(12,92,72,.05)}
+.dtable tbody tr.row.fresh td{background:rgba(232,167,14,.07)}
+.dtable tbody tr.row.fresh:hover td{background:rgba(232,167,14,.12)}
+.newdot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--gold);margin-right:6px;vertical-align:middle;animation:ping 1.7s ease-out infinite}
+.dtable .mono{font-family:var(--mono);font-size:12px}
+.dtable .ip{font-family:var(--mono);color:var(--cyan);cursor:copy}.dtable .ip:hover{text-decoration:underline}
+.dtable .geo b{color:var(--pine);font-weight:600}.dtable .geo span{color:var(--ink3)}
+.dtable .devdot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle}
+.dtable .pg{max-width:200px;overflow:hidden;text-overflow:ellipsis;color:var(--ink)}
+.dtable .stay{font-family:var(--mono);color:var(--ink2)}
+.dtable .caret{display:inline-block;transition:transform .2s;color:var(--ink3);font-size:10px}
+.dtable tr.row.open .caret{transform:rotate(90deg);color:var(--pine)}
+.dtable tr.detail-row td{background:#f4f7f2;padding:0;border-bottom:1px solid var(--line2)}
+.dtable tr.detail-row .inner{padding:14px 18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px 28px;font-size:12px}
+.dtable tr.detail-row .kv{display:flex;gap:10px}
+.dtable tr.detail-row .kv b{font:600 11px var(--mono);color:var(--ink2);min-width:70px;letter-spacing:.04em;flex:none}
+.dtable tr.detail-row .kv span{font-family:var(--mono);font-size:12.5px;line-height:1.55;color:var(--ink);word-break:break-all;white-space:normal}
+.d-pager{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:14px;font:500 12.5px var(--mono);color:var(--ink2)}
+.d-pager .pg-btns{display:flex;gap:8px;align-items:center}
+.d-pager button{font:600 12px var(--mono);color:var(--ink2);background:var(--panel);border:1.5px solid var(--line);padding:6px 14px;cursor:pointer;transition:.2s}
+.d-pager button:hover:not(:disabled){border-color:var(--pine);color:var(--pine)}
+.d-pager button:disabled{opacity:.4;cursor:not-allowed}
+.d-empty,.d-loading{padding:48px 0;text-align:center;color:var(--ink3);font:500 14px var(--mono)}
+.d-spin{display:inline-block;width:13px;height:13px;border:2px solid var(--line);border-top-color:var(--pine);border-radius:50%;vertical-align:-2px;margin-right:6px;animation:dspin .7s linear infinite}
+@keyframes dspin{to{transform:rotate(360deg)}}
+#toast{position:fixed;left:50%;bottom:30px;transform:translate(-50%,10px);background:var(--ink);border:1px solid var(--pine);color:#eef5ef;font:600 13px var(--mono);padding:11px 22px;opacity:0;transition:.3s;z-index:90;pointer-events:none}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+@media(max-width:1080px){.d-stats{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:680px){.d-stats{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<header class="dtop">
+  <div class="wrap">
+    <div class="left">
+      <a class="back" href="/ss-admin.html">← 返回总览</a>
+      <h1>访问明细</h1>
+      <span class="m-badge" id="mBadge">当日</span>
+      <span class="ver-badge" id="verBadge"></span>
+    </div>
+    <button class="out" id="dOut">退出登录</button>
+  </div>
+</header>
+<div id="detail">
+  <div class="wrap">
+    <div class="d-head">
+      <h2><span class="d-mode" id="dMode">当日</span><span class="d-scope" id="dScope"></span></h2>
+      <button class="btn" id="dExport">导出当前结果 CSV</button>
+    </div>
+    <div class="d-tip" id="dTip"></div>
+    <div class="d-stats" id="dStats"></div>
+    <div class="d-dist" id="dDist"></div>
+    <div class="d-notice" id="dNotice" hidden></div>
+    <div class="d-filter">
+      <input class="search" id="dSearch" type="text" placeholder="搜索 IP / 页面 / 地域 / 系统 / UA…">
+      <select id="dDev"><option value="">全部设备</option></select>
+      <select id="dCo"><option value="">全部地域</option></select>
+      <span id="dRangeWrap" style="display:none;gap:8px;align-items:center;">
+        <input type="date" id="dFrom"><span style="color:var(--ink3)">→</span><input type="date" id="dTo">
+      </span>
+      <button class="btn reset" id="dReset">重置筛选</button>
+    </div>
+    <div class="d-tablewrap">
+      <table class="dtable">
+        <thead>
+          <tr>
+            <th style="width:30px"></th>
+            <th data-k="t" class="sorted">时间 <span class="arr">▼</span></th>
+            <th data-k="ip">IP <span class="arr">▼</span></th>
+            <th>地域</th>
+            <th data-k="p">页面 <span class="arr">▼</span></th>
+            <th>设备</th>
+            <th>系统</th>
+            <th>浏览器</th>
+            <th>屏幕</th>
+            <th>来源</th>
+            <th data-k="stay">停留 <span class="arr">▼</span></th>
+          </tr>
+        </thead>
+        <tbody id="dBody"></tbody>
+      </table>
+    </div>
+    <div class="d-pager">
+      <span id="dCount"></span>
+      <div class="pg-btns">
+        <button id="dPrev">← 上一页</button>
+        <span id="dPage"></span>
+        <button id="dNext">下一页 →</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="toast"></div>
+<script src="/detail.js"></script>
+</body>
+</html>

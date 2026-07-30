@@ -45,7 +45,7 @@ button{font-family:inherit}
 .tr{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .src{display:inline-flex;align-items:center;gap:8px;font:600 11.5px var(--mono);letter-spacing:.06em;color:var(--pine);border:1.5px solid var(--pine);padding:6px 12px}
 .src.off{color:var(--gold2);border-color:var(--gold)}
-.toolbar{position:relative;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:18px}
+.toolbar{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:18px}
 .rgroup{display:flex;border:1.5px solid var(--ink)}
 .rbtn{background:transparent;border:0;border-right:1.5px solid var(--ink);color:var(--ink2);font:600 12.5px var(--mono);padding:8px 18px;cursor:pointer;transition:.2s}
 .rbtn:last-child{border-right:0}.rbtn.on{background:var(--pine);color:#f2f8f3}.rbtn:not(.on):hover{color:var(--pine);background:rgba(12,92,72,.07)}
@@ -105,8 +105,79 @@ button{font-family:inherit}
 #toast.on{opacity:1;transform:translate(-50%,0)}
 @media(max-width:1080px){#kpis{grid-template-columns:repeat(3,1fr)}.p-trend{grid-column:span 12}.p-donut{grid-column:span 6}.p-hourly{grid-column:span 6}.p-geo{grid-column:span 6}.p-src{grid-column:span 6}}
 @media(max-width:680px){#kpis{grid-template-columns:repeat(2,1fr)}.grid>*{grid-column:span 12 !important}.cols2{column-count:1}}
+/* ===== 访问明细视图 ===== */
+#detail{display:none}
+#dash.view-detail #detail{display:block}
+#dash.view-detail>.wrap>*:not(.top):not(#detail){display:none!important}
+#dash.view-detail .back-detail{display:inline-flex!important}
+.back-detail{display:none!important}
+.d-head{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin:4px 0 14px}
+.d-head h2{font-family:var(--disp);font-weight:400;font-size:24px;letter-spacing:.06em;display:flex;align-items:center;gap:10px}
+.d-mode{font:600 11px var(--mono);letter-spacing:.1em;color:var(--pine);border:1.5px solid var(--pine);padding:3px 10px;border-radius:999px}
+.d-tip{font:500 11.5px var(--mono);color:var(--ink3);margin-bottom:12px}
+.d-stats{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:16px}
+.d-stat{position:relative;background:var(--panel);border:1px solid var(--line);padding:12px 14px}
+.d-stat::before{content:'';position:absolute;top:-1px;left:-1px;width:11px;height:11px;border-top:2px solid var(--gold);border-left:2px solid var(--gold)}
+.d-stat .l{font:600 10px var(--mono);letter-spacing:.14em;color:var(--ink2)}
+.d-stat .v{font:700 22px/1.2 var(--mono);color:var(--ink);margin-top:2px}
+.d-dist{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:16px}
+.d-dist .panel{padding:14px 16px}
+.d-dist h4{font:600 11px var(--mono);letter-spacing:.12em;color:var(--ink2);margin-bottom:10px}
+.dbar{display:grid;grid-template-columns:minmax(64px,96px) 1fr 34px;gap:8px;align-items:center;padding:4px 0;font-size:12px}
+.dbar .n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink)}
+.dbar .t{height:7px;background:var(--line2);overflow:hidden}
+.dbar .t i{display:block;height:100%;width:0;transition:width .7s cubic-bezier(.2,.7,.3,1)}
+.dbar .c{font:700 12px var(--mono);text-align:right;color:var(--ink2)}
+.d-filter{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--panel);border:1px solid var(--line);padding:12px 14px;margin-bottom:14px}
+.d-filter input,.d-filter select{background:#f2f5ee;border:1.5px solid var(--line);color:var(--ink);font:500 13px var(--mono);padding:7px 10px;outline:none;transition:border .2s}
+.d-filter input:focus,.d-filter select:focus{border-color:var(--pine)}
+.d-filter .search{flex:1;min-width:180px}
+.d-filter .reset{margin-left:auto}
+.d-tablewrap{background:var(--panel);border:1px solid var(--line);overflow-x:auto}
+table.dtable{width:100%;border-collapse:collapse;font-size:12.5px;min-width:940px}
+.dtable th{position:sticky;top:0;background:#eef2ea;font:600 11px var(--mono);letter-spacing:.06em;color:var(--ink2);text-align:left;padding:10px 12px;border-bottom:1.5px solid var(--line);white-space:nowrap;user-select:none}
+.dtable th[data-k]{cursor:pointer}
+.dtable th[data-k]:hover{color:var(--pine)}
+.dtable th .arr{opacity:.35;font-size:9px}
+.dtable th.sorted .arr{opacity:1;color:var(--pine)}
+.dtable td{padding:9px 12px;border-bottom:1px solid var(--line2);vertical-align:middle;white-space:nowrap}
+.dtable tbody tr.row{cursor:pointer;transition:background .15s}
+.dtable tbody tr.row:hover{background:rgba(12,92,72,.05)}
+.dtable .mono{font-family:var(--mono);font-size:12px}
+.dtable .ip{font-family:var(--mono);color:var(--cyan);cursor:copy}
+.dtable .ip:hover{text-decoration:underline}
+.dtable .geo b{color:var(--pine);font-weight:600}
+.dtable .geo span{color:var(--ink3)}
+.dtable .devdot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle}
+.dtable .pg{max-width:200px;overflow:hidden;text-overflow:ellipsis;color:var(--ink)}
+.dtable .stay{font-family:var(--mono);color:var(--ink2)}
+.dtable .caret{display:inline-block;transition:transform .2s;color:var(--ink3);font-size:10px}
+.dtable tr.row.open .caret{transform:rotate(90deg);color:var(--pine)}
+.dtable tr.detail-row td{background:#f4f7f2;padding:0;border-bottom:1px solid var(--line2)}
+.dtable tr.detail-row .inner{padding:14px 18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px 28px;font-size:12px;animation:fadeIn .25s}
+.dtable tr.detail-row .kv{display:flex;gap:10px}
+.dtable tr.detail-row .kv b{font:600 11px var(--mono);color:var(--ink2);min-width:70px;letter-spacing:.04em;flex:none}
+.dtable tr.detail-row .kv span{font-family:var(--mono);font-size:12.5px;line-height:1.55;color:var(--ink);word-break:break-all;white-space:normal}
+.d-pager{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:14px;font:500 12.5px var(--mono);color:var(--ink2)}
+.d-pager .pg-btns{display:flex;gap:8px;align-items:center}
+.d-pager button{font:600 12px var(--mono);color:var(--ink2);background:var(--panel);border:1.5px solid var(--line);padding:6px 14px;cursor:pointer;transition:.2s}
+.d-pager button:hover:not(:disabled){border-color:var(--pine);color:var(--pine)}
+.d-pager button:disabled{opacity:.4;cursor:not-allowed}
+.d-empty,.d-loading{padding:48px 0;text-align:center;color:var(--ink3);font:500 14px var(--mono)}
+@media(max-width:1080px){.d-stats{grid-template-columns:repeat(3,1fr)}.d-dist{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:680px){.d-stats{grid-template-columns:repeat(2,1fr)}.d-dist{grid-template-columns:1fr}}
 .ver-badge{display:inline-block;margin-left:10px;font:600 11px var(--mono);letter-spacing:.05em;color:var(--pine);background:rgba(12,92,72,.08);border:1px solid rgba(12,92,72,.25);padding:2px 9px;border-radius:999px;vertical-align:middle;transition:.2s}
 .ver-badge:hover{background:rgba(12,92,72,.16)}
+/* 范围标识 + 加载/失败反馈（让每个数字自带归属，让每次加载都有回响） */
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.d-scope{margin-left:12px;font:600 11px var(--mono);letter-spacing:.04em;color:var(--pine);background:rgba(12,92,72,.08);border:1px solid rgba(12,92,72,.22);padding:3px 10px;border-radius:999px;vertical-align:middle;white-space:nowrap;transition:.2s}
+.d-notice{display:flex;align-items:center;gap:10px;font:600 12px var(--mono);padding:10px 14px;margin-bottom:14px;border-left:3px solid var(--ink3);background:var(--panel);animation:fadeIn .25s}
+.d-notice.err{border-left-color:#c4472f;color:#a23320;background:#fbeeec}
+.d-notice .d-retry{margin-left:auto;font:600 12px var(--mono);color:#fff;background:#c4472f;border:0;padding:6px 14px;border-radius:4px;cursor:pointer;transition:.2s}
+.d-notice .d-retry:hover{background:#a23320;transform:translateY(-1px)}
+.d-notice .d-retry:active{transform:translateY(0)}
+.d-spin{display:inline-block;width:13px;height:13px;border:2px solid var(--line);border-top-color:var(--pine);border-radius:50%;vertical-align:-2px;margin-right:6px;animation:dspin .7s linear infinite}
+@keyframes dspin{to{transform:rotate(360deg)}}
 /* ===== 登录窗口：密码眼睛 + 底部版本号 ===== */
 .pw-wrap{position:relative}
 .eye{position:absolute;right:7px;top:50%;transform:translateY(-50%);width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:none;border:0;border-radius:6px;cursor:pointer;color:var(--ink3);transition:color .2s,background .2s,transform .12s;z-index:2}
@@ -120,11 +191,6 @@ button{font-family:inherit}
 .login-ver{display:flex;align-items:center;justify-content:center;gap:9px;margin:0 0 10px;font:600 11px var(--mono);letter-spacing:.2em;color:var(--ink3);user-select:none;transition:color .25s}
 .login-ver::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--pine);animation:loginVerPulse 2.6s ease-in-out infinite}
 .login-ver:hover{color:var(--pine)}
-
-/* 导出提示气泡（按钮上方） */
-.dl-tip{position:absolute;top:0;left:50%;transform:translate(-50%,-100%);background:var(--pine);color:#f2f8f3;border:1px solid var(--pine2);font:600 12px var(--mono);letter-spacing:.03em;padding:9px 16px;border-radius:4px;box-shadow:0 6px 18px rgba(12,92,72,.28);opacity:0;pointer-events:none;transition:opacity .3s,transform .3s;z-index:30;white-space:nowrap}
-.dl-tip.on{opacity:1;transform:translate(-50%,calc(-100% - 8px))}
-.dl-tip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:6px solid transparent;border-top-color:var(--pine)}
 </style>
 </head>
 <body>
@@ -163,8 +229,8 @@ button{font-family:inherit}
         <button class="rbtn" data-r="30">30 天</button>
       </div>
       <div class="tools">
-      	<a class="btn" href="/detail.html?mode=today" title="查看今日每条访问的完整明细">当日明细</a>
-        <a class="btn" href="/detail.html?mode=range" title="查看全部访问明细，可筛选/搜索/导出">历史明细</a>
+      	<button class="btn" id="btnDetailToday" title="查看今日每条访问的完整明细">当日明细</button>
+        <button class="btn" id="btnDetailRange" title="查看全部访问明细，可筛选/搜索/导出">历史明细</button>
         <button class="btn" id="bSeed">演示数据</button>
         <button class="btn" id="bJson">导出 JSON</button>
         <button class="btn" id="bCsv">导出 CSV</button>
@@ -182,6 +248,53 @@ button{font-family:inherit}
       <section class="panel p-src"><header>来源 TOP 6</header><div id="srcBox"></div></section>
       <section class="panel p-pg"><header>热门页面</header><div id="pgBox" class="cols2"></div></section>
     </div>
+          <div id="detail">
+        <div class="d-head">
+          <h2>访问明细 <span class="d-mode" id="dMode">当日</span><span class="d-scope" id="dScope"></span></h2>
+          <button class="btn" id="dExport">导出当前结果 CSV</button>
+        </div>
+        <div class="d-tip" id="dTip"></div>
+        <div class="d-stats" id="dStats"></div>
+        <div class="d-dist" id="dDist"></div>
+        <div class="d-notice" id="dNotice" hidden></div>
+        <div class="d-filter">
+          <input class="search" id="dSearch" type="text" placeholder="搜索 IP / 页面 / 地域 / 系统 / UA…">
+          <select id="dDev"><option value="">全部设备</option></select>
+          <select id="dCo"><option value="">全部地域</option></select>
+          <span id="dRangeWrap" style="display:none;gap:8px;align-items:center;">
+            <input type="date" id="dFrom"><span style="color:var(--ink3)">→</span><input type="date" id="dTo">
+          </span>
+          <button class="btn reset" id="dReset">重置筛选</button>
+        </div>
+        <div class="d-tablewrap">
+          <table class="dtable">
+            <thead>
+              <tr>
+                <th style="width:30px"></th>
+                <th data-k="t" class="sorted">时间 <span class="arr">▼</span></th>
+                <th data-k="ip">IP <span class="arr">▼</span></th>
+                <th>地域</th>
+                <th data-k="p">页面 <span class="arr">▼</span></th>
+                <th>设备</th>
+                <th>系统</th>
+                <th>浏览器</th>
+                <th>屏幕</th>
+                <th>来源</th>
+                <th data-k="stay">停留 <span class="arr">▼</span></th>
+              </tr>
+            </thead>
+            <tbody id="dBody"></tbody>
+          </table>
+        </div>
+        <div class="d-pager">
+          <span id="dCount"></span>
+          <div class="pg-btns">
+            <button id="dPrev">← 上一页</button>
+            <span id="dPage"></span>
+            <button id="dNext">下一页 →</button>
+          </div>
+        </div>
+      </div>
     <footer class="note">数据说明：数据存储于服务端 <code>server/data/visits.json</code>；服务端密码鉴权（<code>server/data/auth.json</code>，全设备通用）；地域基于离线 GeoIP。页面每 15 秒自动刷新，可右上角关闭。</footer>
   </div>
 </div>
@@ -323,8 +436,7 @@ button{font-family:inherit}
     renderList('#geoBox', S.geo(list, RANGE), '#0c5c48', false);
     renderList('#srcBox', S.sources(list, RANGE), '#e8a70e', false);
     renderList('#pgBox', S.pages(list, RANGE), '#1f7a8c', true);
-    $('#empty').style.display = list.length ? 'none' : 'block';
-    $('#bSeed').style.display = list.length ? 'none' : ''; }
+    $('#empty').style.display = list.length ? 'none' : 'block'; }
 
   function startLive(){ stopLive(); if (LIVE) liveTimer = setInterval(()=>renderAll(true), 15000); }
   function stopLive(){ if (liveTimer){ clearInterval(liveTimer); liveTimer = null; } }
@@ -358,16 +470,13 @@ button{font-family:inherit}
     const r = await api(API+'/clear', { method:'POST' });
     if (r.status===401) return logout();
     if (r.ok){ toast('数据已清空'); await renderAll(false); } else toast('清空失败'); };
-  function dlTip(msg){ var t=$('#dlTip'); if(!t){ t=document.createElement('div'); t.id='dlTip'; t.className='dl-tip'; var host=$('.tools'); if(host) host.parentNode.insertBefore(t, host); } t.textContent=msg; t.classList.add('on'); clearTimeout(t._tt); t._tt=setTimeout(function(){ t.classList.remove('on'); }, 3800); }
   $('#bJson').onclick = () => { if(!CACHE.list.length) return toast('暂无数据可导出');
-    var name='visit-stats-'+new Date().toISOString().slice(0,10)+'.json';
-    download(name, JSON.stringify(CACHE.list,null,2), 'application/json'); dlTip('✓ 已导出 '+name+'（含访客 IP）· 见浏览器下载栏'); };
+    download('visit-stats.json', JSON.stringify(CACHE.list,null,2), 'application/json'); toast('已导出 JSON'); };
   $('#bCsv').onclick = () => { if(!CACHE.list.length) return toast('暂无数据可导出');
-    var name='visit-stats-'+new Date().toISOString().slice(0,10)+'.csv';
-    const head='时间,IP,页面,访客ID,会话,设备,来源类型,来源,国家,地区,屏幕,语言,时区,停留秒\n';
-    const body=CACHE.list.map(x=>[new Date(x.t).toLocaleString(),x.ip||'',x.p,x.uid,x.sid,x.dev,x.st,x.sl,x.co||'',x.rg||'',x.scr,x.lang||'',x.tz||'',x.stay]
+    const head='时间,页面,访客ID,会话,设备,来源类型,来源,国家,地区,屏幕,语言,时区,停留秒\n';
+    const body=CACHE.list.map(x=>[new Date(x.t).toLocaleString(),x.p,x.uid,x.sid,x.dev,x.st,x.sl,x.co||'',x.rg||'',x.scr,x.lang||'',x.tz||'',x.stay]
       .map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
-    download(name, '\ufeff'+head+body, 'text/csv'); dlTip('✓ 已导出 '+name+'（含访客 IP）· 见浏览器下载栏'); };
+    download('visit-stats.csv', '\ufeff'+head+body, 'text/csv'); toast('已导出 CSV'); };
   $('#bOut').onclick = () => logout();
 
   $('#bPwd').onclick = () => { $('#pwdModal').classList.add('on'); $('#pw0').focus(); };
@@ -379,6 +488,207 @@ button{font-family:inherit}
     const j = await r.json().catch(()=>({}));
     if (r.ok){ $('#pwdModal').classList.remove('on'); ['pw0','pw1','pw2'].forEach(id=>$('#'+id).value=''); $('#pwErr').textContent=''; toast('密码已更新（所有设备通用）'); }
     else $('#pwErr').textContent=(j&&j.err)||'修改失败'; };
+})();
+</script>
+<script>
+/* ===== 访问明细视图（独立模块，零侵入主逻辑）===== */
+(function () {
+  'use strict';
+  var $ = function (s) { return document.querySelector(s); };
+  var API = '/api/ss', PAGE_SIZE = 30;
+  var state = { mode:'today', all:[], filtered:[], sortK:'t', sortDir:-1, page:1, search:'', dev:'', co:'', from:'', to:'' };
+  var DEV_COLOR = { desktop:'#0c5c48', mobile:'#e8a70e', tablet:'#2f6db3' };
+  var DEV_NAME = { desktop:'桌面', mobile:'移动', tablet:'平板' };
+
+  function token(){ return sessionStorage.getItem('ss_token') || ''; }
+  function todayKey(){ var d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+  function dash(v){ return v ? esc(v) : '<span style="color:var(--ink3)">—</span>'; }
+  function fmtTime(t){ var d=new Date(t), p=function(n){return String(n).padStart(2,'0');}; return (d.getMonth()+1)+'-'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds()); }
+  function fmtStay(s){ if(!s) return '—'; return s>=60 ? Math.floor(s/60)+'分'+(s%60?s%60+'秒':'') : s+'秒'; }
+  function toast(msg){ var t=$('#toast'); if(!t) return; t.textContent=msg; t.classList.add('on'); clearTimeout(t._tt); t._tt=setTimeout(function(){ t.classList.remove('on'); }, 1800); }
+
+  function showNotice(kind, msg){
+    var n=$('#dNotice'); if(!n) return;
+    n.hidden=false; n.className='d-notice '+kind;
+    n.innerHTML = msg + (kind==='err' ? ' <button class="d-retry" id="dRetry">重新加载</button>' : '');
+    if(kind==='err'){ var b=$('#dRetry'); if(b) b.onclick=function(){ open(state.mode); }; }
+  }
+  function hideNotice(){ var n=$('#dNotice'); if(n){ n.hidden=true; n.innerHTML=''; } }
+  function renderScope(){
+    var el=$('#dScope'); if(!el) return;
+    var n=state.filtered.length, tot=(state.all||[]).length;
+    var txt;
+    if(state.mode==='today') txt='当日 '+todayKey()+' · '+n+' 条';
+    else if(state.from||state.to) txt='自定义 '+(state.from||'…')+' ~ '+(state.to||'…')+' · '+n+' 条';
+    else txt='全部 · '+n+' 条（库内共 '+tot+' 条）';
+    if(state.search||state.dev||state.co) txt+=' · 已筛选';
+    el.textContent=txt;
+  }
+  function fetchVisits(cb){
+    $('#dBody').innerHTML='<tr><td colspan="11"><div class="d-loading"><span class="d-spin"></span>正在加载明细…</div></td></tr>';
+    fetch(API+'/visits?token='+encodeURIComponent(token())).then(function(r){
+      if(r.status===401){ $('#detail').innerHTML='<div class="d-empty">登录已过期，请刷新页面重新登录。</div>'; return; }
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      return r.json();
+    }).then(function(d){
+      if(!Array.isArray(d)) return;        // 401 等无数据情况：保留旧视图，不清空
+      hideNotice();
+      cb(d);
+    }).catch(function(e){
+      showNotice('err', '加载失败（'+(e&&e.message?e.message:'网络异常')+'）——下方保留上一次成功的数据。');
+      if(!state.all || !state.all.length){
+        $('#dBody').innerHTML='<tr><td colspan="11"><div class="d-empty">未能加载数据，请检查网络后点上方「重新加载」。</div></td></tr>';
+      }
+    });
+  }
+
+  function open(mode){
+    state.mode=mode; state.page=1; state.search=''; state.dev=''; state.co=''; state.from=''; state.to='';
+    $('#dSearch').value=''; $('#dDev').value=''; $('#dCo').value=''; $('#dFrom').value=''; $('#dTo').value='';
+    $('#dMode').textContent = mode==='today' ? '当日' : '历史';
+    $('#dRangeWrap').style.display = mode==='today' ? 'none' : 'inline-flex';
+    $('#dTip').textContent = mode==='today'
+      ? '今日（'+todayKey()+'）每一条访问的完整记录；点任意一行可展开 User-Agent 等详情，点 IP 可复制。'
+      : '全部访问记录，可用日期 / 设备 / 地域 / 关键词筛选；点表头可排序。';
+    $('#dash').classList.add('view-detail');
+    $('#dBody').innerHTML='<tr><td colspan="11"><div class="d-loading">正在加载明细…</div></td></tr>';
+    fetchVisits(function(list){ state.all=list; fillFilters(); apply(); });
+    window.scrollTo(0,0);
+  }
+  function close(){ $('#dash').classList.remove('view-detail'); }
+
+  function inRange(r){
+    if(state.mode==='today') return r.d===todayKey();
+    if(state.from && r.d<state.from) return false;
+    if(state.to && r.d>state.to) return false;
+    return true;
+  }
+  function fillFilters(){
+    var devs={}, cos={};
+    (state.all||[]).forEach(function(r){ if(inRange(r)){ if(r.dev) devs[r.dev]=1; cos[r.co||'未知']=1; } });
+    $('#dDev').innerHTML='<option value="">全部设备</option>'+Object.keys(devs).map(function(k){ return '<option value="'+k+'">'+(DEV_NAME[k]||k)+'</option>'; }).join('');
+    $('#dCo').innerHTML='<option value="">全部地域</option>'+Object.keys(cos).sort().map(function(k){ return '<option value="'+k+'">'+esc(k)+'</option>'; }).join('');
+  }
+  function apply(){
+    var kw=state.search.trim().toLowerCase();
+    state.filtered=(state.all||[]).filter(inRange).filter(function(r){
+      if(state.dev && r.dev!==state.dev) return false;
+      if(state.co && (r.co||'未知')!==state.co) return false;
+      if(kw){ var hay=[r.ip,r.p,r.co,r.rg,r.city,r.ua,r.os,r.browser,r.sl,r.lang].join(' ').toLowerCase(); if(hay.indexOf(kw)<0) return false; }
+      return true;
+    });
+    var k=state.sortK, dir=state.sortDir;
+    state.filtered.sort(function(a,b){ var x=a[k], y=b[k]; if(x==null)x=''; if(y==null)y=''; if(typeof x==='number'&&typeof y==='number') return (x-y)*dir; return String(x).localeCompare(String(y))*dir; });
+    state.page=Math.min(state.page, Math.max(1, Math.ceil(state.filtered.length/PAGE_SIZE)));
+        renderStats(); renderDist(); renderTable(); renderPager(); renderScope();
+  }
+
+  function renderStats(){
+    var rows=state.filtered, uv={}, ips={}, cos={}, stays=[], mob=0;
+    rows.forEach(function(r){ uv[r.uid]=1; if(r.ip) ips[r.ip]=1; cos[(r.co||'未知')+(r.rg||'')]=1; if(r.stay>1&&r.stay<1800) stays.push(r.stay); if(r.dev==='mobile') mob++; });
+    var avg=stays.length?Math.round(stays.reduce(function(a,b){return a+b;},0)/stays.length):0;
+    var cards=[['浏览量 PV',rows.length],['独立访客 UV',Object.keys(uv).length],['独立 IP',Object.keys(ips).length],['国家/地区',Object.keys(cos).length],['平均停留',fmtStay(avg)],['移动端占比',rows.length?Math.round(mob/rows.length*100)+'%':'0%']];
+    $('#dStats').innerHTML=cards.map(function(c){ return '<div class="d-stat"><div class="l">'+c[0]+'</div><div class="v">'+c[1]+'</div></div>'; }).join('');
+  }
+  function topBy(key,n){ var m={}; state.filtered.forEach(function(r){ var k=r[key]||'未知'; m[k]=(m[k]||0)+1; }); return Object.keys(m).map(function(k){return {l:k,v:m[k]};}).sort(function(a,b){return b.v-a.v;}).slice(0,n||5); }
+  function dist(items,color){
+    if(!items.length) return '<div style="color:var(--ink3);font-size:12px">暂无数据</div>';
+    var max=items[0].v||1;
+    return items.map(function(it){ return '<div class="dbar"><span class="n" title="'+esc(it.l)+'">'+esc(it.l)+'</span><span class="t"><i style="background:'+color+'" data-w="'+(it.v/max*100).toFixed(1)+'%"></i></span><span class="c">'+it.v+'</span></div>'; }).join('');
+  }
+  function renderDist(){
+    $('#dDist').innerHTML=
+      '<div class="panel"><h4>设备</h4>'+dist(topBy('dev',4).map(function(x){x.l=DEV_NAME[x.l]||x.l;return x;}),'#0c5c48')+'</div>'+
+      '<div class="panel"><h4>操作系统</h4>'+dist(topBy('os',5),'#2f6db3')+'</div>'+
+      '<div class="panel"><h4>浏览器</h4>'+dist(topBy('browser',5),'#e8a70e')+'</div>'+
+      '<div class="panel"><h4>国家/地区</h4>'+dist(topBy('co',5),'#c4472f')+'</div>';
+    requestAnimationFrame(function(){ requestAnimationFrame(function(){ document.querySelectorAll('#dDist .t i').forEach(function(i){ i.style.width=i.dataset.w; }); }); });
+  }
+  function renderTable(){
+    var body=$('#dBody');
+    if(!state.filtered.length){ body.innerHTML='<tr><td colspan="11"><div class="d-empty">没有符合条件的访问记录。</div></td></tr>'; return; }
+    var start=(state.page-1)*PAGE_SIZE;
+    var rows=state.filtered.slice(start, start+PAGE_SIZE);
+    body.innerHTML=rows.map(function(r,i){
+      var geo='<span class="geo"><b>'+esc(r.co||'未知')+'</b>'+(r.rg?' <span>'+esc(r.rg)+'</span>':'')+(r.city?' <span>· '+esc(r.city)+'</span>':'')+'</span>';
+      return '<tr class="row" data-i="'+(start+i)+'">'+
+        '<td><span class="caret">▶</span></td>'+
+        '<td class="mono">'+fmtTime(r.t)+'</td>'+
+        '<td class="ip" data-ip="'+esc(r.ip||'')+'" title="点击复制">'+dash(r.ip)+'</td>'+
+        '<td>'+geo+'</td>'+
+        '<td class="pg" title="'+esc(r.p)+'">'+esc(r.p||'/')+'</td>'+
+        '<td><span class="devdot" style="background:'+(DEV_COLOR[r.dev]||'#999')+'"></span>'+(DEV_NAME[r.dev]||r.dev||'—')+'</td>'+
+        '<td>'+dash(r.os)+'</td>'+
+        '<td>'+dash(r.browser)+'</td>'+
+        '<td class="mono">'+dash(r.scr)+'</td>'+
+        '<td title="'+esc(r.sl||'')+'">'+dash(r.sl)+'</td>'+
+        '<td class="stay">'+fmtStay(r.stay)+'</td>'+
+      '</tr>';
+    }).join('');
+  }
+  function renderPager(){
+    var total=state.filtered.length, pages=Math.max(1,Math.ceil(total/PAGE_SIZE));
+    $('#dCount').textContent='共 '+total+' 条记录';
+    $('#dPage').textContent='第 '+state.page+' / '+pages+' 页';
+    $('#dPrev').disabled=state.page<=1;
+    $('#dNext').disabled=state.page>=pages;
+  }
+  function detailRowHtml(r){
+    var items=[['完整时间',new Date(r.t).toLocaleString()],['访客 ID',r.uid||'—'],['会话 ID',r.sid||'—'],['来源类型',r.st||'—'],['语言',r.lang||'—'],['时区',r.tz||'—'],['屏幕',r.scr||'—'],['IP 地址',r.ip||'（未记录）'],['User-Agent',r.ua||'（未记录）']];
+    return '<tr class="detail-row"><td colspan="11"><div class="inner">'+items.map(function(kv){ return '<div class="kv"><b>'+kv[0]+'</b><span>'+esc(kv[1])+'</span></div>'; }).join('')+'</div></td></tr>';
+  }
+
+  /* 事件绑定 */
+  $('#btnDetailToday').addEventListener('click', function(){ open('today'); });
+  $('#btnDetailRange').addEventListener('click', function(){ open('range'); });
+  $('#backDetail').addEventListener('click', close);
+  $('#dReset').addEventListener('click', function(){ open(state.mode); });
+  $('#dPrev').addEventListener('click', function(){ if(state.page>1){ state.page--; renderTable(); renderPager(); } });
+  $('#dNext').addEventListener('click', function(){ var pages=Math.ceil(state.filtered.length/PAGE_SIZE); if(state.page<pages){ state.page++; renderTable(); renderPager(); } });
+  var st;
+  $('#dSearch').addEventListener('input', function(){ var v=this.value; clearTimeout(st); st=setTimeout(function(){ state.search=v; state.page=1; apply(); }, 250); });
+  $('#dDev').addEventListener('change', function(){ state.dev=this.value; state.page=1; apply(); });
+  $('#dCo').addEventListener('change', function(){ state.co=this.value; state.page=1; apply(); });
+  $('#dFrom').addEventListener('change', function(){ state.from=this.value; state.page=1; apply(); });
+  $('#dTo').addEventListener('change', function(){ state.to=this.value; state.page=1; apply(); });
+  document.querySelectorAll('.dtable th[data-k]').forEach(function(th){
+    th.addEventListener('click', function(){
+      var k=this.dataset.k;
+      if(state.sortK===k) state.sortDir*=-1; else { state.sortK=k; state.sortDir=(k==='t'?-1:1); }
+      document.querySelectorAll('.dtable th').forEach(function(x){ x.classList.remove('sorted'); var a=x.querySelector('.arr'); if(a)a.textContent='▼'; });
+      this.classList.add('sorted'); var arr=this.querySelector('.arr'); if(arr) arr.textContent=state.sortDir>0?'▲':'▼';
+      apply();
+    });
+  });
+  $('#dBody').addEventListener('click', function(e){
+    var ip=e.target.closest('.ip');
+    if(ip && ip.dataset.ip){ var val=ip.dataset.ip; if(navigator.clipboard){ navigator.clipboard.writeText(val).then(function(){ toast('已复制 IP：'+val); }); } return; }
+    var row=e.target.closest('tr.row');
+    if(!row) return;
+    var isOpen=row.classList.contains('open');
+    var nxt=row.nextElementSibling;
+    if(nxt && nxt.classList.contains('detail-row')) nxt.remove();
+    row.classList.remove('open');
+    if(isOpen) return;
+    var r=state.filtered[+row.dataset.i];
+    if(!r) return;
+    row.classList.add('open');
+    row.insertAdjacentHTML('afterend', detailRowHtml(r));
+  });
+  $('#dExport').addEventListener('click', function(){
+    if(!state.filtered.length){ toast('没有可导出的数据'); return; }
+    var head='时间,IP,国家,地区,城市,页面,设备,系统,浏览器,屏幕,来源类型,来源,语言,时区,停留秒,访客ID,会话ID,User-Agent\n';
+    var body=state.filtered.map(function(r){
+      return [new Date(r.t).toLocaleString(),r.ip||'',r.co||'',r.rg||'',r.city||'',r.p||'',r.dev||'',r.os||'',r.browser||'',r.scr||'',r.st||'',r.sl||'',r.lang||'',r.tz||'',r.stay||0,r.uid||'',r.sid||'',r.ua||'']
+        .map(function(v){ return '"'+String(v).replace(/"/g,'""')+'"'; }).join(',');
+    }).join('\n');
+    var a=document.createElement('a');
+    a.href=URL.createObjectURL(new Blob(['\ufeff'+head+body],{type:'text/csv'}));
+    a.download='visit-detail-'+(state.mode==='today'?todayKey():'all')+'.csv';
+    a.click(); URL.revokeObjectURL(a.href);
+    toast('已导出 '+state.filtered.length+' 条');
+  });
 })();
 </script>
 <script>
