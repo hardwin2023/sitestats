@@ -2,7 +2,12 @@
 
 ![GitHub Release](https://img.shields.io/github/v/release/hardwin2023/sitestats?label=version&color=0c5c48)
 ![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
-
+UI界面：
+<img width="426" height="495" alt="后台管理登录" src="https://github.com/user-attachments/assets/f3436705-29cd-42ba-9bb7-c8cfb3437189" />
+<img width="1214" height="919" alt="总览页" src="https://github.com/user-attachments/assets/77508f04-414c-4ac0-9e2f-138ac3887475" />
+<img width="1209" height="915" alt="当日访问明细" src="https://github.com/user-attachments/assets/43604354-f5f9-409a-af4c-91adbd3a873f" />
+<img width="1214" height="917" alt="历史访问明细" src="https://github.com/user-attachments/assets/f87a4925-82f7-4fd7-911a-3942ce020cb4" />
+设计说明：
 > 零第三方服务、可整体搬运的访问统计组件。**一行命令远程安装**，无需下载；
 > 智能安装器自动探测环境、协商端口、配置 nginx、自检全链路；
 > 从仪表盘一路下探到每一条访问的 IP 与 User-Agent。数据自持、密码自管、版本可控。
@@ -163,10 +168,22 @@ location = /ss-admin.html { add_header Cache-Control "no-cache"; try_files $uri 
 
 > IP / 城市 / 系统 / 浏览器仅对**改字段后**的新访问完整；旧记录优雅降级为"—"。
 
-## 首页挂件（可选）
+## 需要访客数据的页面加入统计
 
-把 `examples/widget.html` 整段贴到页面 `</body>` 前，得右下角半透明"今日 N 次访问"胶囊，悬停变清晰、点击进后台。调用**公开**的 `/api/ss/summary`（仅汇总数字，不含 IP/明细）。
+| 组件 | 作用 | 是否必须 |
+|---|---|---|
+| `ss.js` | 采集访问数据 | **必须**（不插则该页面不被统计） |
+| `widget.html` | 右下角"今日 N 次"胶囊 | 可选（只读不采，须先插 `ss.js`） |
 
+在要统计的页面 `</head>` 前加入一行：
+
+```html
+<script src="/ss.js" defer></script>
+```
+
+- **多页站点**：每个要统计的页面各加一次；**单页应用(SPA)**：加一次即可。
+- **不要胶囊也要插 `ss.js`**——胶囊只是展示，统计靠它。
+- 想要胶囊：把 `examples/widget.html` 整段贴到 `</body>` 前。
 ## 接口（前缀 `/api/ss/`）
 
 | 方法 | 路径 | 鉴权 | 说明 |
