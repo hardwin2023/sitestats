@@ -108,6 +108,9 @@ table.dtable{width:100%;border-collapse:collapse;font-size:12.5px;min-width:940p
 #toast.on{opacity:1;transform:translate(-50%,0)}
 @media(max-width:1080px){.d-stats{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:680px){.d-stats{grid-template-columns:repeat(2,1fr)}}
+
+.dtop .right{display:flex;align-items:center;gap:10px}
+.dtop .d-export-top{padding:7px 14px}
 </style>
 </head>
 <body>
@@ -118,15 +121,15 @@ table.dtable{width:100%;border-collapse:collapse;font-size:12.5px;min-width:940p
       <h1>访问明细</h1>
       <span class="m-badge" id="mBadge">当日</span>
     </div>
-    <button class="out" id="dOut">退出登录</button>
+    <div class="right">
+      <button class="btn d-export-top" id="dExport">导出当前结果 CSV</button>
+      <button class="out" id="dOut">退出登录</button>
+    </div>
   </div>
 </header>
 <div id="detail">
   <div class="wrap">
-    <div class="d-head">
-      <h2><span class="d-scope" id="dScope"></span></h2>
-      <button class="btn" id="dExport">导出当前结果 CSV</button>
-    </div>
+
     <div class="d-tip" id="dTip"></div>
     <div class="d-stats" id="dStats"></div>
     <div class="d-dist" id="dDist"></div>
@@ -171,6 +174,6 @@ table.dtable{width:100%;border-collapse:collapse;font-size:12.5px;min-width:940p
   </div>
 </div>
 <div id="toast"></div>
-<script src="/detail.js"></script>
+<script src="/detail.js?v=110"></script>
 </body>
 </html>
