@@ -169,7 +169,7 @@ location = /ss-admin.html { add_header Cache-Control "no-cache"; try_files $uri 
 
 > IP / 城市 / 系统 / 浏览器仅对**改字段后**的新访问完整；旧记录优雅降级为"—"。
 
-## 需要访客数据的页面加入统计
+## 🎈🎈需要访客数据的页面加入统计🎈🎈
 
 | 组件 | 作用 | 是否必须 |
 |---|---|---|
