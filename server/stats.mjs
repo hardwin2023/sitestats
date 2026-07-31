@@ -159,14 +159,14 @@ app.post('/api/ss/login', (req,res)=>{
   const now = Date.now();
   if (rec && rec.until && now < rec.until) {
     res.set('Retry-After', String(Math.ceil((rec.until-now)/1000)));
-    return res.status(429).json({ err:'失败次数过多，请 '+Math.ceil((rec.until-now)/60000)+' 分钟后再试' });
+    return res.status(429).json({ err:'失败次数过多，请 '+Math.ceil((rec.until-now)/60000)+' 分钟后再试', locked: true });
   }
   const { password } = req.body || {};
   if (typeof password!=='string' || sha256(password)!==auth.passHash) {
     const n = (rec && rec.until && now>=rec.until) ? 1 : ((rec ? rec.n : 0) + 1);
     const locked = n >= LOGIN_MAX_FAILS;
     loginFails.set(ip, { n: locked?0:n, until: locked ? now+LOGIN_LOCK_MS : 0 });
-    return res.status(locked?429:401).json({ err: locked ? '失败次数过多，已锁定，请 15 分钟后再试' : '密码错误' });
+    return res.status(locked?429:401).json({ err: locked ? '失败次数过多，已锁定，请 15 分钟后再试' : '密码错误', fails: locked?LOGIN_MAX_FAILS:n, max: LOGIN_MAX_FAILS, locked: locked });
   }
   loginFails.delete(ip);
   res.json({ ok:1, token: newToken() });
